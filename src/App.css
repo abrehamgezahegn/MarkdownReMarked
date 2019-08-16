@@ -3,17 +3,28 @@
   max-width: 1000px;
   width: 100%;
   border: solid 3px blue;
-  margin: 100px;
+  margin: 200px;
 }
 
-.textarea {
+.wrapper {
   width: 700px;
   height: 300px;
+}
+.textarea {
+  width: 100%;
+  height: 100px;
   outline: solid 3px rgba(0, 0, 0, 0.6);
   border: none;
   padding: 50px;
   font-weight: 500;
   font-size: 16px;
+}
+
+.tooltip {
+  position: relative;
+  top: 50px;
+  left: 100px;
+  z-index: 1000;
 }
 
 .container pre {
@@ -54,6 +65,28 @@
   text-decoration: none;
 }
 
-.container a:hover {
-  font-size: 24px;
+.mentionsContainer {
+  height: auto;
+  max-height: 160px;
+  width: 300px;
+
+  background-color: #fff;
+  overflow-y: scroll;
+  border-radius: 6px;
+}
+
+.nameTag {
+  padding-left: 10px;
+  padding-right: 10px;
+  padding-left: 10px;
+}
+
+.nameTag:hover {
+  background: rgba(16, 125, 172, 0.2);
+  padding-left: 15px;
+}
+.nameTag h4 {
+  margin: 0;
+  padding-top: 20px;
+  padding-bottom: 20px;
 }
