@@ -46,37 +46,58 @@ const peeps = [
 	}
 ];
 
-const Mentions = ({ searchTerm = "", onClick }) => {
-	let filtered = peeps.filter(item =>
-		item.name.toLowerCase().includes(searchTerm.toLowerCase())
-	);
-	if (searchTerm === "") {
-		filtered = peeps;
-	}
-	return (
-		<div className="mentionsContainer">
-			{filtered.map(item => (
-				<div
-					className="nameTag"
-					onClick={() => {
-						onClick(item.name, item.profile);
-					}}
-				>
-					<h4
-						style={{
-							width: "100%",
-							height: "100%",
-							borderBottom: "solid 1px rgba(0,0,0,0.1)",
-							cursor: "pointer"
+class Mentions extends React.Component {
+	defaultProps = {
+		searchTerm: "",
+		onClick: () => {}
+	};
+
+	state = {
+		cursor: 0
+	};
+
+	onKeyDown = e => {
+		console.log(e.keyCode);
+	};
+
+	render() {
+		let filtered = peeps.filter(item =>
+			item.name
+				.toLowerCase()
+				.includes(this.props.searchTerm.toLowerCase())
+		);
+		if (this.props.searchTerm === "") {
+			filtered = peeps;
+		}
+
+		return (
+			<div className="mentionsContainer">
+				{filtered.map((item, i) => (
+					<div
+						className={`nameTag ${
+							this.state.cursor === i ? "activeListItem" : ""
+						}`}
+						onClick={() => {
+							this.props.onClick(item.name, item.profile);
 						}}
+						tabIndex={0}
 					>
-						{" "}
-						{item.name}{" "}
-					</h4>
-				</div>
-			))}
-		</div>
-	);
-};
+						<h4
+							style={{
+								width: "100%",
+								height: "100%",
+								borderBottom: "solid 1px rgba(0,0,0,0.1)",
+								cursor: "pointer"
+							}}
+						>
+							{" "}
+							{item.name}{" "}
+						</h4>
+					</div>
+				))}
+			</div>
+		);
+	}
+}
 
 export default Mentions;

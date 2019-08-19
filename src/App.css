@@ -1,23 +1,14 @@
-.editorContainer {
-  height: 500px;
-  max-width: 1000px;
-  width: 100%;
-  border: solid 3px blue;
-  margin: 200px;
-}
-
-.wrapper {
+.textarea-wrapper {
   width: 700px;
-  height: 300px;
 }
 .textarea {
   width: 100%;
-  height: 100px;
-  outline: solid 3px rgba(0, 0, 0, 0.6);
+  height: auto;
   border: none;
-  padding: 50px;
+  padding: 20px;
   font-weight: 500;
   font-size: 16px;
+  outline: none;
 }
 
 .tooltip {
@@ -27,7 +18,7 @@
   z-index: 1000;
 }
 
-.container pre {
+.app-container pre {
   background-color: #243447;
   color: #fbe473;
   font-weight: 500;
@@ -36,29 +27,31 @@
   padding-bottom: 30px;
   width: 100%;
   height: auto;
-  max-width: 700px;
+  max-height: 600px;
+  max-width: 900px;
   overflow-x: scroll;
+  overflow-y: scroll;
 }
 
-.container img {
+.app-container img {
   width: 400px;
   height: 400px;
 }
 
-.container blockquote {
+.app-container blockquote {
   padding-left: 10px;
   border-left: 6px solid rgba(16, 125, 172, 0.7);
   max-width: 500px;
 }
 
-.container blockquote p {
+.app-container blockquote p {
   background-color: rgba(16, 125, 172, 0.3);
   padding-bottom: 10px;
   padding-top: 10px;
   padding-left: 8px;
 }
 
-.container a {
+.app-container a {
   font-weight: 600;
   font-size: 18px;
   color: rgba(16, 125, 172, 0.8);
@@ -89,4 +82,39 @@
   margin: 0;
   padding-top: 20px;
   padding-bottom: 20px;
+}
+
+#mention {
+  background-color: rgba(0, 0, 0, 0.5);
+  color: yellow;
+}
+
+.hover-input-contianer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 500px;
+  height: 30px;
+  padding: 15px 10px;
+  background: #fff;
+  border-radius: 6px;
+  box-shadow: rgba(0, 0, 0, 0.1) 5px 10px 10px;
+}
+
+.hover-input {
+  width: 80%;
+  height: 100%;
+  padding-left: 20px;
+  font-size: 16px;
+}
+
+.hover-button {
+  width: 12%;
+  height: 110%;
+  cursor: pointer;
+  background: #ff0000;
+  color: #fff;
+  border: none;
+  font-weight: 700;
+  border-radius: 6px;
 }
