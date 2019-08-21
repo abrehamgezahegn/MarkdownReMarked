@@ -1,7 +1,7 @@
 import React from "react";
 
 class HoverInput extends React.Component {
-	defaultProps = {
+	static defaultProps = {
 		top: 0,
 		left: 0,
 		display: false,
@@ -18,7 +18,11 @@ class HoverInput extends React.Component {
 			this.setState({ value: "" });
 			this.props.closeInput();
 		}
-		if (e.key === "Enter") {
+		if (
+			e.key === "Enter" &&
+			this.state.value.length > 0 &&
+			this.state.value.length < 150
+		) {
 			this.setState({ value: "" });
 			this.props.submitInputValue(this.state.value);
 		}
@@ -26,7 +30,8 @@ class HoverInput extends React.Component {
 
 	onClick = () => {
 		this.setState({ value: "" });
-		this.props.submitInputValue(this.state.value);
+		if (this.state.value.length > 0)
+			this.props.submitInputValue(this.state.value);
 	};
 
 	render() {
@@ -34,9 +39,9 @@ class HoverInput extends React.Component {
 			<div
 				className="hover-input-contianer"
 				style={{
-					position: "relative",
+					position: "absolute",
 					top: this.props.top + 20,
-					left: this.props.left,
+					left: this.props.left + 30,
 					display: this.props.display ? "flex" : "none"
 				}}
 			>

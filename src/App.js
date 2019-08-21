@@ -3,20 +3,22 @@ import "./App.css";
 import Markdown from "markdown-to-jsx";
 import Mentions from "./Mentions";
 import HoverInput from "./HoverInput";
+import CommandsList from "./CommandsList";
+import ContentEditable from "react-contenteditable";
 
 var getCaretCoordinates = require("textarea-caret");
 
 // convention strings used in hotkeys
 const _IMAGE = "image";
-const _YOUTUBE = "youtube";
+const _VIDEOEMBED = "youtube";
 const _LINE = "line";
 const _LINK = "link";
 
 const marked = require("marked");
 
 // literal youtube embed
-
 const youtubeEmbed = `<iframe width="600" height="529" src="https://www.youtube.com/embed/youtubeID" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
+const loomEmbed = `<div style={{ position: "relative", paddingBottom: "55.3125%", height: 0 }}> <iframe width="600" height="550" src="https://www.loom.com/embed/loomID" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen style={{ position: "absolute", top: 0, left: 0, width: "50%", height: "50%" }} ></iframe> </div>`;
 
 class App extends React.Component {
 	state = {
@@ -30,7 +32,7 @@ class App extends React.Component {
 		searchTerm: "",
 		commandSearchTerm: "",
 		searching: false,
-		onCommand: false,
+		showCommands: false,
 		loading: false,
 		showInput: false
 	};
@@ -51,19 +53,27 @@ class App extends React.Component {
 
 		// toggle searching is lastchar matches @
 		if (lastChar === "@") {
-			this.setState({ searching: true, showInput: false });
+			this.setState({
+				searching: true,
+				showInput: false,
+				showCommands: false
+			});
 		}
 
 		if (lastChar === "/") {
-			this.setState({ onCommand: true });
+			this.setState({
+				showCommands: true,
+				searching: false,
+				showInput: false
+			});
 		}
 
-		let { searching, onCommand } = this.state;
+		let { searching, showCommands } = this.state;
 
-		if (onCommand) {
+		if (showCommands) {
 			if (lastChar === " ") {
 				// if space is hit
-				this.setState({ onCommand: false, commandSearchTerm: "" });
+				this.setState({ showCommands: false, commandSearchTerm: "" });
 				let commandSearchTerm = value.substring(
 					value.lastIndexOf("/") + 1,
 					caretPositionEnd
@@ -87,7 +97,6 @@ class App extends React.Component {
 		// getting the pixel coordinates of textarea caret (important piece of the tooltip)
 		var coordinates = getCaretCoordinates(e.target, caretPositionEnd);
 		let top = coordinates.top + 60;
-
 		// styles fetch position from state I set here
 		this.setState({ top, left: coordinates.left });
 	};
@@ -124,32 +133,34 @@ class App extends React.Component {
 
 		// TODO try to use subString and replace
 		const caretPosition = this.state.caretPosition;
+		const caretPositionEnd  = this.state.caretPositionEnd
+		const value = this.state.value;
 
 		const post = this.state.value;
 		const array = post.split("");
 
 		let markdown = "";
 		if (type === _IMAGE) {
-			markdown = `\n\n ![](${embed}) \n\n`;
-		} else if (type === _YOUTUBE) {
-			markdown = `\n\n${embed}\n\n`;
+			markdown = `\n ![](${embed}) \n\n`;
+		} else if (type === _VIDEOEMBED) {
+			markdown = `\n${embed}\n\n`;
 		} else if (type === _LINE) {
-			markdown = `\n\n${embed}\n\n`;
+			markdown = `\n${embed}\n\n`;
 		}
-
 		array.splice(caretPosition, 0, markdown);
 		const finalString = array.join("");
 
-		this.setState({ value: finalString, loading: false });
+		let newValue = `${value.substring(
+					0,
+					caretPosition
+				)} ${markdown} ${value.substring(caretPositionEnd)}`;
+					
+
+		this.setState({ value: newValue, loading: false , inputType: "" });
 	};
 
 	onKeyDown = e => {
 		// hotkey listener
-
-		if (e.key === "Escape") {
-			this.setState({ searching: false, showInput: false });
-		}
-		if (!e.ctrlKey) return null; // only listen to ctrl + <key>
 
 		let textArea = this.refs.textArea;
 		let cursorStart = textArea.selectionStart;
@@ -158,7 +169,11 @@ class App extends React.Component {
 		let value = this.state.value;
 		let selectedString = value.substring(cursorStart, cursorEnd).trim();
 
-		console.log(selectedString);
+		if (e.key === "Escape") {
+			this.setState({ searching: false, showInput: false });
+		}
+
+		if (!e.ctrlKey) return null; // only listen to ctrl + <key>
 
 		this.setState({ selectedString });
 
@@ -174,8 +189,9 @@ class App extends React.Component {
 				let newValue =
 					value.substring(0, cursorStart) +
 					"**" +
-					value.substring(cursorStart, cursorEnd) +
-					"**";
+					selectedString +
+					"** " +
+					value.substring(cursorEnd);
 				this.setState({ value: newValue });
 
 				break;
@@ -186,7 +202,7 @@ class App extends React.Component {
 				let newValue = `${value.substring(
 					0,
 					cursorStart
-				)} *${value.substring(cursorStart, cursorEnd)}*`;
+				)} *${selectedString}* ${value.substring(cursorEnd)}`;
 				this.setState({ value: newValue });
 				break;
 			}
@@ -196,7 +212,10 @@ class App extends React.Component {
 				let newValue = `${value.substring(
 					0,
 					cursorStart
-				)} # ${value.substring(cursorStart, cursorEnd)} `;
+				)} # ${value.substring(
+					cursorStart,
+					cursorEnd
+				)} ${value.substring(cursorEnd)}`;
 
 				this.setState({ value: newValue });
 				break;
@@ -206,7 +225,10 @@ class App extends React.Component {
 				let newValue = `${value.substring(
 					0,
 					cursorStart
-				)} ## ${value.substring(cursorStart, cursorEnd)} `;
+				)} ## ${value.substring(
+					cursorStart,
+					cursorEnd
+				)} ${value.substring(cursorEnd)}`;
 
 				this.setState({ value: newValue });
 				break;
@@ -217,10 +239,9 @@ class App extends React.Component {
 				let newValue = `${value.substring(
 					0,
 					cursorStart
-				)} \n\n \`\`\`\n ${value.substring(
-					cursorStart,
+				)} \n\n \`\`\`\n ${selectedString} \n\n \`\`\` \n ${value.substring(
 					cursorEnd
-				)} \n\n \`\`\`  `;
+				)}`;
 
 				this.setState({ value: newValue });
 
@@ -232,7 +253,7 @@ class App extends React.Component {
 				let newValue = `${value.substring(
 					0,
 					cursorStart
-				)} ~~${value.substring(cursorStart, cursorEnd)}~~ `;
+				)} ~~${selectedString}~~ ${value.substring(cursorEnd)}`;
 				this.setState({ value: newValue });
 
 				break;
@@ -245,15 +266,25 @@ class App extends React.Component {
 			}
 			case "Enter": {
 				e.preventDefault();
-				// let markedString = `___ \n`;
-				// this.insertMarkDownAtCursor(markedString, _LINE);
 				let newValue = `${value.substring(
 					0,
 					cursorStart
-				)} ${value.substring(cursorStart, cursorEnd)}\n___ `;
-				this.setState({ value: newValue });
+				)} ${value.substring(
+					cursorStart,
+					cursorEnd
+				)}\n\n\n___ \n\n\n ${value.substring(cursorEnd)}`;
+				this.setState({ value: newValue }); 
 
 				break;
+			}
+			case "k": {
+				e.preventDefault();
+				this.setState({
+					searching: false,
+					showCommands: false,
+					showInput: true,
+					inputType: _IMAGE
+				});
 			}
 			case "l": {
 				e.preventDefault();
@@ -267,12 +298,12 @@ class App extends React.Component {
 
 				break;
 			}
-			case "y": {
+			case "e": {
 				e.preventDefault();
 				this.setState({
 					showInput: true,
 					searching: false,
-					inputType: _YOUTUBE
+					inputType: ""
 				});
 
 				break;
@@ -285,25 +316,60 @@ class App extends React.Component {
 	insertFromInput = inputValue => {
 		let value = this.state.value;
 		let selectedString = this.state.selectedString;
+		const cursorStart = this.state.caretPosition;
+		const cursorEnd = this.state.caretPositionEnd;
+
+		if (this.state.inputType === _IMAGE) {
+			this.insertMarkDownAtCursor(inputValue, _IMAGE);
+			this.setState({ showInput: false });
+		}
+
 		if (this.state.inputType === _LINK) {
 			let link = inputValue;
 			if (link) {
 				let markedString = `<a href="${link}" target="_blank"> ${selectedString} </a>`;
-				const newValue = value.replace(selectedString, markedString);
+
+				const newValue= `${value.substring(
+					0,
+					cursorStart
+				)} ${markedString} ${value.substring(cursorEnd)}`
+
+				//const newValue = value.replace(selectedString, markedString);
 				this.setState({
 					value: newValue,
 					inputValue: "",
 					showInput: false
 				});
+				let textArea = this.refs.textArea;
+				textArea.focus();
 			}
-		} else if (this.state.inputType === _YOUTUBE) {
+			return;
+		}
+		if (inputValue.includes("www.loom.com")) {
+			let loomID = inputValue.replace("https://www.loom.com/share/", "");
+			let iDfiedLoom = loomEmbed.replace("loomID", loomID);
+
+			let markedString = `\n\n${iDfiedLoom}\n\n`;
+
+			// state cleanup
+			this.setState({
+				inputValue: "",
+				showInput: false
+			});
+			let textArea = this.refs.textArea;
+			textArea.focus();
+			// function name is pretty descriptive
+			this.insertMarkDownAtCursor(markedString, _VIDEOEMBED);
+		}
+		if (inputValue.includes("https://www.youtube.com/watch")) {
 			let youtubeUrl = inputValue;
 
 			// extracating video id from link
 			let youtubeID = youtubeUrl.replace(
 				"https://www.youtube.com/watch?v=",
 				""
-			);
+			).replace(/&index.+/ , "").replace(/&list/ , "?list")
+			console.log("IDDDD:" ,youtubeID)
 
 			// inserting youtube id in iframe defined at the top(youtubeEmbed)
 			let embadedYoutube = youtubeEmbed.replace("youtubeID", youtubeID);
@@ -317,15 +383,17 @@ class App extends React.Component {
 				showInput: false
 			});
 
+			let textArea = this.refs.textArea;
+			textArea.focus();
+
 			// function name is pretty descriptive
-			this.insertMarkDownAtCursor(markedString, _YOUTUBE);
+			this.insertMarkDownAtCursor(markedString, _VIDEOEMBED);
 		}
 	};
 
 	insertMentions = markedString => {
 		// deletes @.. and inserts mention link(marked string)
 		const value = this.state.value;
-		console.log("value: ", value);
 		const caretPositionEnd = this.state.caretPositionEnd;
 
 		let newValue =
@@ -340,38 +408,27 @@ class App extends React.Component {
 
 	onMentionClick = (name, profile) => {
 		// event listener for list of names click
-		let markedString = ` <span id="mention"> @${name} <span>`;
+		let markedString = ` <span id="mention"> @${name} </span> `;
 		this.setState({ searching: false });
 		this.insertMentions(markedString);
 	};
 
-	handleDivChange = e => {
-		let value = e.target.value;
-		console.log(e.target);
-		this.setState({ value });
-	};
-
 	render() {
-		console.log(this.state);
 		return (
 			<div className="app-container" style={{ margin: 50 }}>
 				<div className="textarea-wrapper">
-					<div // TODO refactor to own component
-						style={{
-							display: this.state.searching ? "block" : "none",
-							width: 30,
-							height: 30,
-							zIndex: 100,
-							position: "relative",
-							top: this.state.top,
-							left: this.state.left
-						}}
-					>
-						<Mentions
-							searchTerm={this.state.searchTerm}
-							onClick={this.onMentionClick}
-						/>
-					</div>
+					<CommandsList
+						top={this.state.top}
+						left={this.state.left}
+						display={this.state.showCommands}
+					/>
+					<Mentions
+						searchTerm={this.state.searchTerm}
+						onClick={this.onMentionClick}
+						top={this.state.top}
+						left={this.state.left}
+						searching={this.state.searching}
+					/>
 					<HoverInput
 						top={this.state.top}
 						left={this.state.left}
@@ -381,7 +438,6 @@ class App extends React.Component {
 						}}
 						submitInputValue={this.insertFromInput}
 					/>
-
 					<textarea
 						ref="textArea"
 						disabled={this.state.loading}
@@ -392,8 +448,7 @@ class App extends React.Component {
 						onKeyDown={this.onKeyDown}
 					/>
 				</div>
-				<input type="file" onChange={this.handleImage} />
-
+							
 				<div
 					dangerouslySetInnerHTML={{
 						__html: marked(this.state.value)

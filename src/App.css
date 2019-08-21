@@ -1,21 +1,20 @@
+/*** editor styles **/
+
+@import url('https://fonts.googleapis.com/css?family=Lexend+Deca&display=swap');
+
 .textarea-wrapper {
   width: 700px;
 }
 .textarea {
-  width: 100%;
-  height: auto;
+  margin-left: 200px;
+  width: 900px;
+  height: 500px;
   border: none;
-  padding: 20px;
+  padding: 40px;
   font-weight: 500;
-  font-size: 16px;
+  font-size: 28px;
+  font-family: 'Lexend Deca', sans-serif;
   outline: none;
-}
-
-.tooltip {
-  position: relative;
-  top: 50px;
-  left: 100px;
-  z-index: 1000;
 }
 
 .app-container pre {
@@ -58,37 +57,53 @@
   text-decoration: none;
 }
 
+/*********************/
+
+/* Mentions styles */
 .mentionsContainer {
   height: auto;
-  max-height: 160px;
-  width: 300px;
-
+  max-height: 250px;
+  width: 450px;
   background-color: #fff;
   overflow-y: scroll;
   border-radius: 6px;
+    box-shadow: rgba(0, 0, 0, 0.1) 5px 10px 10px;
+
 }
 
 .nameTag {
   padding-left: 10px;
   padding-right: 10px;
-  padding-left: 10px;
+  display:flex;
+  align-items:center;
+  justify-content: space-between;
+  height: 80px;
 }
 
 .nameTag:hover {
   background: rgba(16, 125, 172, 0.2);
-  padding-left: 15px;
+  cursor: pointer;
 }
 .nameTag h4 {
   margin: 0;
-  padding-top: 20px;
-  padding-bottom: 20px;
+  width: 100%;
 }
+
+.mentionsContainer img{
+	width: 50px;
+	height: 50px;
+	border-radius: 50%;
+	margin-right: 15px;
+	margin-left: 10px;
+}
+
 
 #mention {
-  background-color: rgba(0, 0, 0, 0.5);
   color: yellow;
 }
+/***************/
 
+/* Hover input styles */
 .hover-input-contianer {
   display: flex;
   justify-content: space-between;
@@ -117,4 +132,60 @@
   border: none;
   font-weight: 700;
   border-radius: 6px;
+}
+
+/********/
+
+/*** Commadn list styles ***/
+
+.hover-command-contianer {
+  width: 500px;
+  height: 400px;
+  padding: 15px 0px;
+  background: #fff;
+  border-radius: 6px;
+  box-shadow: rgba(0, 0, 0, 0.1) 5px 10px 10px;
+  overflow-y: scroll;
+}
+
+.command-item {
+  height: 100px;
+  padding: 0px 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+}
+
+.command-item:hover {
+  background-color: rgba(16, 125, 172, 0.2);
+}
+
+.command-item img {
+  width: 60px;
+  height: 60px;
+  border-radius: 6px;
+  margin-right: 15px;
+}
+
+.command-item .item-text {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 10px 0px;
+}
+
+.command-item p {
+  margin: 0;
+  color: rgba(0, 0, 0, 0.8);
+}
+
+.command-item h3 {
+  margin: 0;
+}
+
+.hover-command-contianer .header {
+  margin-left: 10px;
 }
