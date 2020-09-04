@@ -5,7 +5,7 @@
   "dependencies": {
     "@ckeditor/ckeditor5-build-balloon-block": "^12.3.1",
     "immutable": "^4.0.0-rc.12",
-    "markdown-to-jsx": "^6.10.3",
+    "markdown-to-jsx": "^6.11.4",
     "marked": "^0.7.0",
     "prettier": "^1.18.2",
     "react": "^16.9.0",
